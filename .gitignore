@@ -1,0 +1,8 @@
+/vendor
+/public/.htaccess
+/public/assets
+/storage/cache/*
+/storage/logs/*
+/database/*
+/bin
+.env

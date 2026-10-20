@@ -1,0 +1,29 @@
+{
+    "name": "soot/payshield",
+    "description": "An modern escrow platform",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "firebase/php-jwt": "^6.10",
+        "monolog/monolog": "^3.5",
+        "vlucas/phpdotenv": "^5.6",
+        "nesbot/carbon": "^3.13"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "app/Helpers/helpers.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist"
+    }
+}

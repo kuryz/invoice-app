@@ -19,11 +19,7 @@ $router = \App\Core\Application::getInstance()->getRouter();
 |--------------------------------------------------------------------------
 */
 $router->get('/', [InvoicePortalController::class, 'landing']);
-$router->get('/about-us', [WelcomeController::class, 'about']);
-$router->get('/services', [WelcomeController::class, 'service']);
-$router->get('/blogs', [WelcomeController::class, 'blog']);
-$router->get('/blog/{slugs}', [WelcomeController::class, 'singleblog']);
-$router->get('/contact-us', [WelcomeController::class, 'contact']);
+// 
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +37,7 @@ $router->get('/logout', [AuthController::class, 'logout']);
 |--------------------------------------------------------------------------
 */
 
-$router->get('/exchange-history', [WelcomeController::class, 'exchangeHistory']);
+// $router->get('/exchange-history', [WelcomeController::class, 'exchangeHistory']);
 
 
 // Authenticated user routes

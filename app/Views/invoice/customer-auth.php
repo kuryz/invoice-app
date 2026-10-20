@@ -1,4 +1,199 @@
-<?php $this->setLayout(''); $error=$session->getFlash('error'); $success=$session->getFlash('success'); $esc=static fn($v)=>htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8'); ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b31"><title><?= $esc($pageTitle??'NairaBill account') ?></title><style>
-:root{--ink:#111d32;--muted:#657187;--line:#e0e7f0;--green:#087f65;--bg:#f4f7fb}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#d9fff0 0,transparent 35%),radial-gradient(ellipse at 100% 90%,#dce7ff 0,transparent 35%),var(--bg);font:15px/1.55 Inter,system-ui,sans-serif;color:var(--ink);min-height:100vh;display:grid;place-items:center;padding:24px}.card{background:rgba(255,255,255,.94);width:min(100%,470px);padding:36px;border:1px solid #dfe7f1;border-radius:22px;box-shadow:0 25px 90px #172d4b12}.logo{font-weight:950;font-size:25px;letter-spacing:-1.3px;text-decoration:none;color:var(--ink)}.logo span{color:var(--green)}.tag{display:inline-flex;align-items:center;gap:7px;margin-top:25px;border:1px solid #c9f0e2;background:#effcf7;color:#087f65;padding:6px 10px;border-radius:30px;font-size:11px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}.dot{width:7px;height:7px;background:#16b889;border-radius:50%}h1{font-size:30px;line-height:1.12;letter-spacing:-1.2px;margin:14px 0 9px}p{color:var(--muted);margin:0 0 22px}label{display:block;font-weight:750;font-size:13px;margin:16px 0 7px}input{width:100%;border:1px solid #d6dfeb;border-radius:10px;padding:13px 14px;font:inherit;background:#fff;outline:none}input:focus{border-color:#0d9b79;box-shadow:0 0 0 3px #0d9b7917}button,.btn{display:block;width:100%;border:0;background:var(--green);color:white;padding:14px;border-radius:10px;font:inherit;font-weight:850;margin-top:22px;text-align:center;text-decoration:none;cursor:pointer;box-shadow:0 8px 20px #087f6520}.alert{padding:12px 13px;border-radius:10px;margin:14px 0;font-size:13px}.error{background:#fff0ef;color:#a53c37}.success{background:#eafaf3;color:#087f65}.foot{text-align:center;margin:22px 0 0;font-size:13px;color:var(--muted)}.foot a{color:var(--green);font-weight:800;text-decoration:none}.secure{display:flex;gap:8px;align-items:center;color:#7b8799;font-size:12px;margin-top:22px}.secure svg{flex:none}@media(max-width:480px){.card{padding:25px}}
-</style></head><body><main class="card"><a class="logo" href="/invoice-platform">Naira<span>Bill</span></a><div class="tag"><span class="dot"></span> Passwordless, secure access</div><h1><?= $mode==='register'?'Create your workspace':'Sign in with your email' ?></h1><p><?= $mode==='register'?'Start sending professional invoices and integrate billing into your platform. We will email you a secure sign-in link.':'No password to remember. Enter your business email and we will send you a one-time sign-in link.' ?></p><?php if($error): ?><div class="alert error"><?= $esc(strip_tags((string)$error)) ?></div><?php endif; ?><?php if($success): ?><div class="alert success"><?= $esc(strip_tags((string)$success)) ?></div><?php endif; ?><form method="post" action="/customer/<?= $mode==='register'?'register':'login' ?>"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><?php if($mode==='register'): ?><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required maxlength="160" placeholder="e.g. Ada Okafor"><label for="business">Business or platform name</label><input id="business" name="business_name" required maxlength="160" placeholder="e.g. Acme Digital"><?php endif; ?><label for="email">Business email address</label><input id="email" type="email" name="email" autocomplete="email" required maxlength="190" placeholder="you@company.com"><button type="submit"><?= $mode==='register'?'Create workspace & email link':'Email me a sign-in link' ?> <span aria-hidden="true">→</span></button></form><div class="foot"><?php if($mode==='register'): ?>Already have a workspace? <a href="/customer/login">Sign in</a><?php else: ?>New to NairaBill? <a href="/customer/register">Create a workspace</a><?php endif; ?></div><div class="secure"><span>◆</span><span>Links expire after 15 minutes and work once. Never share your sign-in email.</span></div></main></body></html>
+<?php 
+$error = $session->getFlash('error');
+$success = $session->getFlash('success');
+$esc = static fn($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); ?>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#101b31">
+    <title><?= $esc($pageTitle ?? 'NairaBill account') ?></title>
+    <style>
+        :root {
+            --ink: #111d32;
+            --muted: #657187;
+            --line: #e0e7f0;
+            --green: #087f65;
+            --bg: #f4f7fb
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at 10% 0%, #d9fff0 0, transparent 35%), radial-gradient(ellipse at 100% 90%, #dce7ff 0, transparent 35%), var(--bg);
+            font: 15px/1.55 Inter, system-ui, sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px
+        }
+
+        .card {
+            background: rgba(255, 255, 255, .94);
+            width: min(100%, 470px);
+            padding: 36px;
+            border: 1px solid #dfe7f1;
+            border-radius: 22px;
+            box-shadow: 0 25px 90px #172d4b12
+        }
+
+        .logo {
+            font-weight: 950;
+            font-size: 25px;
+            letter-spacing: -1.3px;
+            text-decoration: none;
+            color: var(--ink)
+        }
+
+        .logo span {
+            color: var(--green)
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 25px;
+            border: 1px solid #c9f0e2;
+            background: #effcf7;
+            color: #087f65;
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: .08em;
+            text-transform: uppercase
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: #16b889;
+            border-radius: 50%
+        }
+
+        h1 {
+            font-size: 30px;
+            line-height: 1.12;
+            letter-spacing: -1.2px;
+            margin: 14px 0 9px
+        }
+
+        p {
+            color: var(--muted);
+            margin: 0 0 22px
+        }
+
+        label {
+            display: block;
+            font-weight: 750;
+            font-size: 13px;
+            margin: 16px 0 7px
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #d6dfeb;
+            border-radius: 10px;
+            padding: 13px 14px;
+            font: inherit;
+            background: #fff;
+            outline: none
+        }
+
+        input:focus {
+            border-color: #0d9b79;
+            box-shadow: 0 0 0 3px #0d9b7917
+        }
+
+        button,
+        .btn {
+            display: block;
+            width: 100%;
+            border: 0;
+            background: var(--green);
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            font: inherit;
+            font-weight: 850;
+            margin-top: 22px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px #087f6520
+        }
+
+        .alert {
+            padding: 12px 13px;
+            border-radius: 10px;
+            margin: 14px 0;
+            font-size: 13px
+        }
+
+        .error {
+            background: #fff0ef;
+            color: #a53c37
+        }
+
+        .success {
+            background: #eafaf3;
+            color: #087f65
+        }
+
+        .foot {
+            text-align: center;
+            margin: 22px 0 0;
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .foot a {
+            color: var(--green);
+            font-weight: 800;
+            text-decoration: none
+        }
+
+        .secure {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            color: #7b8799;
+            font-size: 12px;
+            margin-top: 22px
+        }
+
+        .secure svg {
+            flex: none
+        }
+
+        @media(max-width:480px) {
+            .card {
+                padding: 25px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="card">
+    <a class="logo" href="/invoice-platform">Naira<span>Bill</span></a>
+        <div class="tag"><span class="dot"></span> Passwordless, secure access</div>
+        <h1><?= $mode === 'register' ? 'Create your workspace' : 'Sign in with your email' ?></h1>
+        <p><?= $mode === 'register' ? 'Start sending professional invoices and integrate billing into your platform. We will email you a secure sign-in link.' : 'No password to remember. Enter your business email and we will send you a one-time sign-in link.' ?></p><?php if ($error): ?><div class="alert error"><?= $esc(strip_tags((string)$error)) ?></div><?php endif; ?><?php if ($success): ?><div class="alert success"><?= $esc(strip_tags((string)$success)) ?></div><?php endif; ?><form method="post" action="/customer/<?= $mode === 'register' ? 'register' : 'login' ?>"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><?php if ($mode === 'register'): ?><label for="name">Your name</label><input id="name" name="name" autocomplete="name" required maxlength="160" placeholder="e.g. Ada Okafor"><label for="business">Business or platform name</label><input id="business" name="business_name" required maxlength="160" placeholder="e.g. Acme Digital"><?php endif; ?><label for="email">Business email address</label><input id="email" type="email" name="email" autocomplete="email" required maxlength="190" placeholder="you@company.com"><button type="submit"><?= $mode === 'register' ? 'Create workspace & email link' : 'Email me a sign-in link' ?> <span aria-hidden="true">→</span></button></form>
+        <div class="foot">
+        <?php if ($mode === 'register'): ?>Already have a workspace? 
+        <a href="/customer/login">Sign in</a><?php else: ?>New to NairaBill? <a href="/customer/register">Create a workspace</a><?php endif; ?></div>
+        <div class="secure">
+        <span>◆</span>
+        <span>Links expire after 15 minutes and work once. Never share your sign-in email.</span></div>
+    </main>
+</body>
+
+</html>

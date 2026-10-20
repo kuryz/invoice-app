@@ -44,6 +44,18 @@ if (!function_exists('cache')) {
     }
 }
 
+if(!function_exists('esc')){
+    function esc($v) {
+        return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if(!function_exists('money')){
+    function money($c, $v) {
+        return $c . ' ' . number_format((float)$v, 2);
+    }
+}
+
 if(!function_exists('time_elapsed_string')){
     function time_elapsed_string($datetime, $full = false) {
         $now = new DateTime();

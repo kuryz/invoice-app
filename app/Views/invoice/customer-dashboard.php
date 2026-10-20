@@ -1,5 +1,132 @@
-<?php $this->setLayout(''); $ok=$session->getFlash('success');$err=$session->getFlash('error');$newKey=$session->get('invoice_new_api_key');if($newKey)$session->remove('invoice_new_api_key');$esc=static fn($v)=>htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');$money=static fn($c,$v)=>$c.' '.number_format((float)$v,2); ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b31"><title>NairaBill · Merchant console</title><style>:root{--ink:#17243a;--muted:#6d7b91;--line:#e1e7f0;--green:#087f65;--bg:#f4f7fb}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}.shell{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}.side{background:#101b31;color:#dce7f7;padding:25px 16px;border-right:1px solid #1d2b43}.brand{font-size:24px;font-weight:900;margin:0 12px 32px}.brand span{color:#9fe3ad}.side a{display:block;text-decoration:none;color:#c1cde0;padding:11px 12px;border-radius:8px;margin:4px 0;font-weight:650}.side a:hover,.side a.active{background:#1a3444;color:#80f0c2}.side .hint{color:#9aacc5;font-size:12px;padding:20px 12px;border-top:1px solid #26344b;margin-top:20px}.main{padding:32px;min-width:0;background:radial-gradient(ellipse at 100% 0%,#e8f8f2 0,transparent 28%),var(--bg)}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}.top h1{margin:0;font-size:29px;letter-spacing:-1.2px;font-weight:850}.muted{color:var(--muted)}.btn,button{display:inline-block;border:0;border-radius:8px;background:var(--green);color:#fff;padding:10px 13px;text-decoration:none;font:inherit;font-weight:750;cursor:pointer}.btn.light{background:#fff;color:var(--ink);border:1px solid var(--line)}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}.card,.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 7px 25px #172d4b06}.card .num{font-size:28px;font-weight:850;letter-spacing:-1px;margin-top:8px;color:#12243a}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.sectionhead h2{font-size:18px;margin:0}table{border-collapse:collapse;width:100%;min-width:680px}th,td{text-align:left;padding:12px 9px;border-bottom:1px solid #edf1ee}th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}td{font-size:13px}.tablewrap{overflow:auto}.pill{display:inline-block;background:#e7f8f1;color:#087f65;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:850}.pill.bad{background:#fff0ed;color:#a23d2d}.alert{padding:12px;border-radius:9px;margin-bottom:16px}.success{background:#e9f6ed;color:#236747}.error{background:#fff0ed;color:#a23d2d}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-weight:700;font-size:12px;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;border:1px solid #d8e2db;border-radius:8px;padding:11px;font:inherit;background:white}.field.full{grid-column:1/-1}.note{background:#f0f7f1;border-radius:9px;padding:12px;margin:10px 0;color:#355a48;overflow-wrap:anywhere}.keyform{display:flex;gap:8px;flex-wrap:wrap}.keyform input{padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit}.keyform input[name=label]{flex:1;min-width:140px}.key{font:12px ui-monospace,monospace;overflow-wrap:anywhere}@media(max-width:900px){.shell{grid-template-columns:1fr}.side{padding:14px}.side nav{display:flex;gap:4px;overflow:auto}.side a{white-space:nowrap}.brand{margin:0 10px 10px}.side .hint{display:none}.main{padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.top h1{font-size:22px}.cards .num{font-size:22px}}</style></head><body><div class="shell"><aside class="side"><div class="brand">Naira<span>Bill</span></div><nav><a class="active" href="/customer/dashboard">Overview</a><a href="/customer/invoices">Invoices</a><a href="#create-invoice">Create invoice</a><a href="#api-keys">API keys</a><a href="/invoice-platform">API docs</a><a href="/customer/logout">Sign out</a></nav><div class="hint">Business workspace<br><strong><?= $esc($customer['workspace_name']) ?></strong></div></aside><main class="main"><header class="top"><div><h1>Business dashboard</h1><div class="muted">Your billing operations at a glance · <?= $esc($customer['workspace_name']) ?></div></div><a class="btn" href="#create-invoice">+ New invoice</a></header><?php if($ok): ?><div class="alert success"><?= $esc(strip_tags((string)$ok)) ?></div><?php endif; ?><?php if($err): ?><div class="alert error"><?= $esc(strip_tags((string)$err)) ?></div><?php endif; ?><?php if($newKey): ?><section class="note"><strong>Your new API key — copy it now. It will not be shown again.</strong><p class="key"><?= $esc($newKey) ?></p><button type="button" onclick="navigator.clipboard.writeText(<?= json_encode($newKey) ?>).then(()=>this.textContent='Copied')">Copy key</button></section><?php endif; ?><section class="cards"><div class="card"><div class="muted">Total invoices</div><div class="num"><?= number_format((int)($stats['total']??0)) ?></div></div><div class="card"><div class="muted">Paid invoices</div><div class="num"><?= number_format((int)($stats['paid_count']??0)) ?></div></div><div class="card"><div class="muted">Awaiting payment</div><div class="num"><?= number_format((int)($stats['unpaid_count']??0)) ?></div></div><div class="card"><div class="muted">Paid invoice volume</div><div class="num" style="font-size:22px"><?= $esc($customer['default_currency']) ?> <?= number_format((float)($stats['paid_volume']??0),2) ?></div></div></section>
-<section class="panel" id="create-invoice"><div class="sectionhead"><h2>Create an invoice</h2><span class="muted">Hosted invoice link</span></div><form method="post" action="/customer/invoices"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><div class="formgrid"><div class="field"><label>Customer name</label><input name="customer_name" required maxlength="160"></div><div class="field"><label>Customer email</label><input type="email" name="customer_email" required></div><div class="field full"><label>Item / service description</label><input name="description" required maxlength="255"></div><div class="field"><label>Quantity</label><input type="number" name="quantity" min="0.001" step="0.001" value="1" required></div><div class="field"><label>Unit price</label><input type="number" name="unit_price" min="0" step="0.01" required></div><div class="field"><label>Currency</label><select name="currency"><option value="NGN">NGN — Nigerian Naira</option><option value="USD">USD — US Dollar</option><option value="GHS">GHS — Ghanaian Cedi</option><option value="KES">KES — Kenyan Shilling</option><option value="GBP">GBP — Pound Sterling</option></select></div><div class="field"><label>Transaction fee payer</label><select name="fee_payer"><option value="customer">Customer pays</option><option value="merchant">My business pays</option><option value="split">Split between both</option></select></div><div class="field"><label>Tax (%)</label><input type="number" name="tax_rate" min="0" max="100" step="0.001" value="0"></div><div class="field"><label>Discount (amount)</label><input type="number" name="discount" min="0" step="0.01" value="0"></div><div class="field"><label>Due date</label><input type="date" name="due_date"></div><div class="field full"><button type="submit">Create invoice</button></div></div></form></section>
-<section class="panel"><div class="sectionhead"><h2>Recent invoices</h2><a href="/customer/invoices" class="btn light">View all</a></div><div class="tablewrap"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Total</th><th>Fee payer</th><th>Status</th><th>Created</th><th>Link</th></tr></thead><tbody><?php if(!$invoices): ?><tr><td colspan="7" class="muted">No invoices yet. Create your first invoice above.</td></tr><?php endif; foreach($invoices as $i): ?><tr><td><strong><?= $esc($i['invoice_number']) ?></strong></td><td><?= $esc($i['customer_name']) ?></td><td><?= $esc($i['currency']) ?> <?= number_format((float)$i['total_amount'],2) ?></td><td><?= $esc(ucfirst($i['fee_payer'])) ?></td><td><span class="pill <?= in_array($i['status'],['cancelled','expired','refunded'])?'bad':'' ?>"><?= $esc($i['status']) ?></span></td><td><?= $esc(substr((string)$i['created_at'],0,10)) ?></td><td><a href="<?= $esc($i['hosted_url']?:('/pay/'.$i['public_id'])) ?>" target="_blank" rel="noopener">Open invoice</a></td></tr><?php endforeach; ?></tbody></table></div></section>
-<section class="panel" id="api-keys"><div class="sectionhead"><h2>API keys</h2><span class="muted">Keep live keys secret</span></div><form class="keyform" method="post" action="/customer/api-keys"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><input name="label" placeholder="Key label (e.g. Production API)" maxlength="100"><select name="mode"><option value="test">Test mode</option><option value="live">Live mode</option></select><button type="submit">Generate key</button></form><div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Label</th><th>Mode</th><th>Key prefix</th><th>Last used</th><th>Status</th><th>Action</th></tr></thead><tbody><?php if(!$keys): ?><tr><td colspan="6" class="muted">No API keys yet.</td></tr><?php endif; foreach($keys as $k): ?><tr><td><?= $esc($k['label']) ?></td><td><?= $esc($k['mode']) ?></td><td class="key"><?= $esc($k['key_prefix']) ?>…</td><td><?= $esc($k['last_used_at']?:'Never') ?></td><td><span class="pill <?= $k['revoked_at']?'bad':'' ?>"><?= $k['revoked_at']?'Revoked':'Active' ?></span></td><td><?php if(!$k['revoked_at']): ?><form method="post" action="/customer/api-keys/<?= (int)$k['id'] ?>/revoke" onsubmit="return confirm('Revoke this API key? Integrations using it will stop working.')"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><button type="submit" style="background:#9b3d2e">Revoke</button></form><?php endif; ?></td></tr><?php endforeach; ?></tbody></table></div><p class="muted" style="margin-top:12px">API endpoint: <code>/api/v1/billing/invoices</code> · Send your key in the <code>X-API-Key</code> header. Never expose keys in frontend JavaScript.</p></section></main></div></body></html>
+<?php $this->layout = 'layouts/customer';
+$ok = $session->getFlash('success');
+$err = $session->getFlash('error');
+$newKey = $session->get('invoice_new_api_key');
+if ($newKey) $session->remove('invoice_new_api_key');
+
+ ?>
+
+
+        <header class="top">
+            <div>
+                <h1>Business dashboard</h1>
+                <div class="muted">Welcome, <?= esc($customer['name']) ?> · <?= esc($customer['workspace_name']) ?></div>
+            </div><a class="btn" href="#create-invoice">+ New invoice</a>
+        </header><?php if ($ok): ?><div class="alert success"><?= esc(strip_tags((string)$ok)) ?></div><?php endif; ?><?php if ($err): ?><div class="alert error"><?= esc(strip_tags((string)$err)) ?></div><?php endif; ?><?php if ($newKey): ?><section class="note"><strong>Your new API key — copy it now. It will not be shown again.</strong>
+                <p class="key"><?= esc($newKey) ?></p><button type="button" onclick="navigator.clipboard.writeText(<?= json_encode($newKey) ?>).then(()=>this.textContent='Copied')">Copy key</button>
+            </section><?php endif; ?><section class="cards">
+            <div class="card">
+                <div class="muted">Total invoices</div>
+                <div class="num"><?= number_format((int)($stats['total'] ?? 0)) ?></div>
+            </div>
+            <div class="card">
+                <div class="muted">Paid invoices</div>
+                <div class="num"><?= number_format((int)($stats['paid_count'] ?? 0)) ?></div>
+            </div>
+            <div class="card">
+                <div class="muted">Awaiting payment</div>
+                <div class="num"><?= number_format((int)($stats['unpaid_count'] ?? 0)) ?></div>
+            </div>
+            <div class="card">
+                <div class="muted">Paid invoice volume</div>
+                <div class="num" style="font-size:22px"><?= esc($customer['default_currency']) ?> <?= number_format((float)($stats['paid_volume'] ?? 0), 2) ?></div>
+            </div>
+        </section>
+        <section class="panel" id="create-invoice">
+            <div class="sectionhead">
+                <h2>Create an invoice</h2><span class="muted">Hosted invoice link</span>
+            </div>
+            <form method="post" action="/customer/invoices"><input type="hidden" name="_token" value="<?= esc($token) ?>">
+                <div class="formgrid">
+                    <div class="field"><label>Customer name</label><input name="customer_name" required maxlength="160"></div>
+                    <div class="field"><label>Customer email</label><input type="email" name="customer_email" required></div>
+                    <div class="field full"><label>Item / service description</label><input name="description" required maxlength="255"></div>
+                    <div class="field"><label>Quantity</label><input type="number" name="quantity" min="0.001" step="0.001" value="1" required></div>
+                    <div class="field"><label>Unit price</label><input type="number" name="unit_price" min="0" step="0.01" required></div>
+                    <div class="field"><label>Currency</label><select name="currency">
+                            <option value="NGN">NGN — Nigerian Naira</option>
+                            <option value="USD">USD — US Dollar</option>
+                            <option value="GHS">GHS — Ghanaian Cedi</option>
+                            <option value="KES">KES — Kenyan Shilling</option>
+                            <option value="GBP">GBP — Pound Sterling</option>
+                        </select></div>
+                    <div class="field"><label>Transaction fee payer</label><select name="fee_payer">
+                            <option value="customer">Customer pays</option>
+                            <option value="merchant">My business pays</option>
+                            <option value="split">Split between both</option>
+                        </select></div>
+                    <div class="field"><label>Tax (%)</label><input type="number" name="tax_rate" min="0" max="100" step="0.001" value="0"></div>
+                    <div class="field"><label>Discount (amount)</label><input type="number" name="discount" min="0" step="0.01" value="0"></div>
+                    <div class="field"><label>Due date</label><input type="date" name="due_date"></div>
+                    <div class="field full"><button type="submit">Create invoice</button></div>
+                </div>
+            </form>
+        </section>
+        <section class="panel">
+            <div class="sectionhead">
+                <h2>Recent invoices</h2><a href="/customer/invoices" class="btn light">View all</a>
+            </div>
+            <div class="tablewrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Fee payer</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Link</th>
+                        </tr>
+                    </thead>
+                    <tbody><?php if (!$invoices): ?><tr>
+                                <td colspan="7" class="muted">No invoices yet. Create your first invoice above.</td>
+                            </tr><?php endif;
+                                foreach ($invoices as $i): ?><tr>
+                                <td><strong><?= esc($i['invoice_number']) ?></strong></td>
+                                <td><?= esc($i['customer_name']) ?></td>
+                                <td><?= esc($i['currency']) ?> <?= number_format((float)$i['total_amount'], 2) ?></td>
+                                <td><?= esc(ucfirst($i['fee_payer'])) ?></td>
+                                <td><span class="pill <?= in_array($i['status'], ['cancelled', 'expired', 'refunded']) ? 'bad' : '' ?>"><?= esc($i['status']) ?></span></td>
+                                <td><?= esc(substr((string)$i['created_at'], 0, 10)) ?></td>
+                                <td><a href="<?= esc($i['hosted_url'] ?: ('/pay/' . $i['public_id'])) ?>" target="_blank" rel="noopener">Open invoice</a></td>
+                            </tr><?php endforeach; ?></tbody>
+                </table>
+            </div>
+        </section>
+        <section class="panel" id="api-keys">
+            <div class="sectionhead">
+                <h2>API keys</h2><span class="muted">Keep live keys secret</span>
+            </div>
+            <form class="keyform" method="post" action="/customer/api-keys"><input type="hidden" name="_token" value="<?= esc($token) ?>"><input name="label" placeholder="Key label (e.g. Production API)" maxlength="100"><select name="mode">
+                    <option value="test">Test mode</option>
+                    <option value="live">Live mode</option>
+                </select><button type="submit">Generate key</button></form>
+            <div class="tablewrap" style="margin-top:12px">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Mode</th>
+                            <th>Key prefix</th>
+                            <th>Last used</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody><?php if (!$keys): ?><tr>
+                                <td colspan="6" class="muted">No API keys yet.</td>
+                            </tr><?php endif;
+                                foreach ($keys as $k): ?><tr>
+                                <td><?= esc($k['label']) ?></td>
+                                <td><?= esc($k['mode']) ?></td>
+                                <td class="key"><?= esc($k['key_prefix']) ?>…</td>
+                                <td><?= esc($k['last_used_at'] ?: 'Never') ?></td>
+                                <td><span class="pill <?= $k['revoked_at'] ? 'bad' : '' ?>"><?= $k['revoked_at'] ? 'Revoked' : 'Active' ?></span></td>
+                                <td><?php if (!$k['revoked_at']): ?><form method="post" action="/customer/api-keys/<?= (int)$k['id'] ?>/revoke" onsubmit="return confirm('Revoke this API key? Integrations using it will stop working.')"><input type="hidden" name="_token" value="<?= $esc($token) ?>"><button type="submit" style="background:#9b3d2e">Revoke</button></form><?php endif; ?></td>
+                            </tr><?php endforeach; ?></tbody>
+                </table>
+            </div>
+            <p class="muted" style="margin-top:12px">API endpoint: <code>/api/v1/billing/invoices</code> · Send your key in the <code>X-API-Key</code> header. Never expose keys in frontend JavaScript.</p>
+        </section>
+    
